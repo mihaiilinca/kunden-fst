@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from "react";
 import axios from "axios";
 import Message from "./Message";
+import Progress from "./Progress";
 
 const FileUpload = () => {
   //actual file and filename should go into state because the label "Choose File" needs to be replaced with the actual filename
@@ -9,6 +10,7 @@ const FileUpload = () => {
   const [filename, setFilename] = useState("Choose File...");
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [message, setMessage] = useState("");
+  const [uploadPercent, setUploadPercent] = useState(0);
 
   const onChange = (e) => {
     setFile(e.target.files[0]);
@@ -29,6 +31,17 @@ const FileUpload = () => {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+        //progress bar for upload
+        onUploadProgress: (progressEvent) => {
+          setUploadPercent(
+            parseInt(
+              //get rid of progress bar after 10 seconds of finished upload
+              Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            )
+          );
+          setTimeout(() => setUploadPercent(0), 1000);
+        },
+        //clear loaded percentage bar
       });
       const { fileName, filePath } = response.data;
 
@@ -42,6 +55,7 @@ const FileUpload = () => {
       }
     }
   };
+
   return (
     <Fragment>
       {message ? <Message msg={message} /> : null}
@@ -58,19 +72,20 @@ const FileUpload = () => {
             {filename}
           </label>
         </div>
+        <Progress percentage={uploadPercent} />
         <input
           type="submit"
           value="Upload"
           className="btn btn-primary btn-block mt-4"
         />
       </form>
-      {uploadedFiles ? (
+      {/* {uploadedFiles ? (
         <div className="row mt-5">
           <div className="col-md-6 m-auto">
             <h3 className="text-center">{uploadedFiles.fileName}</h3>
           </div>
         </div>
-      ) : null}
+      ) : null} */}
     </Fragment>
   );
 };
