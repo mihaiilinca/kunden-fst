@@ -1,36 +1,25 @@
 const express = require("express");
 const fileUpload = require("express-fileupload");
-const FtpDeploy = require("ftp-deploy");
-const ftpDeploy = new FtpDeploy();
-
 const app = express();
+var EasyFtp = require("easy-ftp");
+var ftp = new EasyFtp();
 
-app.use(fileUpload());
-
-const config = {
-  user: "user",
-  // Password optional, prompted if none given
-  password: "password",
-  host: "ftp.someserver.com",
-  port: 21,
-  localRoot: __dirname + "/local-folder",
-  remoteRoot: "/public_html/remote-folder/",
-  // include: ["*", "**/*"],      // this would upload everything except dot files
-  include: ["*.php", "dist/*", ".*"],
-  // e.g. exclude sourcemaps, and ALL files in node_modules (including dot files)
-  exclude: [
-    "dist/**/*.map",
-    "node_modules/**",
-    "node_modules/**/.*",
-    ".git/**",
-  ],
-  // delete ALL existing files at destination before uploading, if true
-  deleteRemote: false,
-  // Passive mode is forced (EPSV command is not sent)
-  forcePasv: true,
-  // use sftp or ftp
-  sftp: false,
+var config = {
+  host: "127.0.0.1",
+  type: "FTP",
+  port: "",
+  username: "Naj",
+  password: "",
 };
+ftp.connect(config);
+
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+  })
+);
+
 app.post("/upload", (req, res) => {
   console.log(req.files);
   if (req.files === null) {
@@ -38,23 +27,18 @@ app.post("/upload", (req, res) => {
   }
   const file = req.files.file;
 
-  ftpDeploy.deploy(config, function (err, res) {
+  ftp.upload(file.tempFilePath, "/test", function (err) {
     if (err) {
       console.log(err);
       return res.status(500).send(err);
     } else {
       console.log("finished:", res);
-      res.json({ fileName: file.name, filePath: `/uploads/${file.name}` });
+      res.json({ fileName: file.name, filePath: `/upload/${file.name}` });
     }
+    ftp.close();
   });
-  // file.mv(`${__dirname}/client/public/uploads/${file.name}`, (err) => {
-  //   //here is the path to the uploaded file
-  //   if (err) {
-  //     console.error(err);
-  //     return res.status(500).send(err);
-  //   }
+
   //   res.json({ fileName: file.name, filePath: `/uploads/${file.name}` });
-  // });
 });
 
 const PORT = process.env.PORT || 5000;
