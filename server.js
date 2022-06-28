@@ -11,12 +11,14 @@ var config = {
   username: "Naj",
   password: "",
 };
+
 ftp.connect(config);
 
 app.use(
   fileUpload({
     useTempFiles: true,
     tempFileDir: "/tmp/",
+    preserveExtension: true,
   })
 );
 
@@ -25,20 +27,23 @@ app.post("/upload", (req, res) => {
   if (req.files === null) {
     return res.status(400).json({ msg: "No file was uploaded" }); //error message if no file was uploaded
   }
+
   const file = req.files.file;
+  const tempFileName = file.tempFilePath.split("/").at(-1);
 
   ftp.upload(file.tempFilePath, "/test", function (err) {
     if (err) {
       console.log(err);
       return res.status(500).send(err);
     } else {
-      console.log("finished:", res);
-      res.json({ fileName: file.name, filePath: `/upload/${file.name}` });
+      // console.log("finished:", res);
+      res.json({ fileName: file.name, filePath: `/test/${file.name}` });
     }
+    // ftp.mv(`/test/${tempFileName}`, "/abc.pdf", function (error) {
+    // if (error) throw error;
+    // });
     ftp.close();
   });
-
-  //   res.json({ fileName: file.name, filePath: `/uploads/${file.name}` });
 });
 
 const PORT = process.env.PORT || 5000;
