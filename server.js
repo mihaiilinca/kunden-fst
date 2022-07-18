@@ -32,18 +32,23 @@ app.post("/upload", (req, res) => {
   }
 
   const file = req.files.file;
-  const tempFileName = file.tempFilePath.split("/").at(-1);
 
-  ftp.upload(file.tempFilePath, `/test/${file.name}`, function (err) {
-    if (err) {
-      console.log(err);
-      return res.status(500).send(err);
-    } else {
-      // console.log("finished:", res);
-      res.json({ fileName: file.name, filePath: `/test/${file.name}` });
+  ftp.upload(
+    file.tempFilePath,
+    `/${customConfig["serverDirPath"]}/${file.name}`,
+    function (err) {
+      if (err) {
+        console.log(err);
+        return res.status(500).send(err);
+      } else {
+        res.json({
+          fileName: file.name,
+          filePath: `${customConfig["serverDirPath"]}/${file.name}`,
+        });
+      }
+      ftp.close();
     }
-    ftp.close();
-  });
+  );
 });
 
 const PORT = process.env.PORT || customConfig["serverPort"];

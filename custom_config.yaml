@@ -6,3 +6,4 @@ username: "Naj"
 password: ""
 serverPort: 5000
 whiteListfilter: ".pdf"
+serverDirPath: "/test"
