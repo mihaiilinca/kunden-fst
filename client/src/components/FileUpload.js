@@ -2,6 +2,7 @@ import React, { Fragment, useState } from "react";
 import axios from "axios";
 import Message from "./Message";
 import Progress from "./Progress";
+import { useNavigate, Redirect } from "react-router-dom";
 
 const FileUpload = () => {
   //actual file and filename should go into state because the label "Choose File" needs to be replaced with the actual filename
@@ -11,6 +12,12 @@ const FileUpload = () => {
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [message, setMessage] = useState("");
   const [uploadPercent, setUploadPercent] = useState(0);
+
+  let navigate = useNavigate();
+
+  const refreshPage = () => {
+    window.location.reload();
+  };
 
   const onChange = (e) => {
     setFile(e.target.files[0]);
@@ -39,7 +46,7 @@ const FileUpload = () => {
               Math.round((progressEvent.loaded * 100) / progressEvent.total)
             )
           );
-          setTimeout(() => setUploadPercent(0), 1000);
+          setTimeout(() => setUploadPercent(0), 2500);
         },
         //clear loaded percentage bar
       });
@@ -58,6 +65,11 @@ const FileUpload = () => {
 
   return (
     <Fragment>
+      <div className="container mt-4">
+        <h4 className="display-4 text-center mb-4">
+          <i className="fa-solid fa-upload"></i>File Transfer Tool
+        </h4>
+      </div>
       {message ? <Message msg={message} /> : null}
       <form onSubmit={onSubmit}>
         <div className="custom-file">
@@ -67,6 +79,7 @@ const FileUpload = () => {
             id="customFile"
             onChange={onChange}
             multiple
+            accept=""
           />
           <label className="custom-file-label" htmlFor="customFile">
             {filename}
@@ -79,13 +92,6 @@ const FileUpload = () => {
           className="btn btn-primary btn-block mt-4"
         />
       </form>
-      {/* {uploadedFiles ? (
-        <div className="row mt-5">
-          <div className="col-md-6 m-auto">
-            <h3 className="text-center">{uploadedFiles.fileName}</h3>
-          </div>
-        </div>
-      ) : null} */}
     </Fragment>
   );
 };

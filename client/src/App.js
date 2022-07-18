@@ -1,14 +1,24 @@
-import React from "react";
+import React, { Fragment } from "react";
 import FileUpload from "./components/FileUpload";
-import "./App.css";
+import Login from "./components/Login";
+import ErrorPage from "./components/ErrorPage";
 
-const App = () => (
-  <div className="container mt-4">
-    <h4 className="display-4 text-center mb-4">
-      <i className="fab fa-react"></i>File Transfer Tool
-    </h4>
-    <FileUpload />
-  </div>
-);
+import "./App.css";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+
+const App = () => {
+  return (
+    <Router>
+      <Fragment>
+        <Routes>
+          <Route path="/login" element={<Login />}></Route>
+          <Route path="/" element={<Login />}></Route>
+          <Route path="/uploader" element={<FileUpload />}></Route>
+          <Route path="*" element={<ErrorPage />}></Route>
+        </Routes>
+      </Fragment>
+    </Router>
+  );
+};
 
 export default App;

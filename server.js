@@ -1,22 +1,27 @@
 const express = require("express");
 const fileUpload = require("express-fileupload");
 const app = express();
-var EasyFtp = require("easy-ftp");
-var ftp = new EasyFtp();
+const EasyFtp = require("easy-ftp");
+const ftp = new EasyFtp();
+const fs = require("fs");
+const yaml = require("js-yaml");
+const customConfig = yaml.load(fs.readFileSync("./custom_config.yaml"));
 
-var config = {
-  host: "127.0.0.1",
-  type: "FTP",
-  port: "",
-  username: "Naj",
-  password: "",
+const config = {
+  host: customConfig["host"],
+  type: customConfig["type"],
+  port: customConfig["port"],
+  username: customConfig["username"],
+  password: customConfig["host"],
 };
+
 ftp.connect(config);
 
 app.use(
   fileUpload({
     useTempFiles: true,
     tempFileDir: "/tmp/",
+    preserveExtension: true,
   })
 );
 
@@ -25,21 +30,21 @@ app.post("/upload", (req, res) => {
   if (req.files === null) {
     return res.status(400).json({ msg: "No file was uploaded" }); //error message if no file was uploaded
   }
-  const file = req.files.file;
 
-  ftp.upload(file.tempFilePath, "/test", function (err) {
+  const file = req.files.file;
+  const tempFileName = file.tempFilePath.split("/").at(-1);
+
+  ftp.upload(file.tempFilePath, `/test/${file.name}`, function (err) {
     if (err) {
       console.log(err);
       return res.status(500).send(err);
     } else {
-      console.log("finished:", res);
-      res.json({ fileName: file.name, filePath: `/upload/${file.name}` });
+      // console.log("finished:", res);
+      res.json({ fileName: file.name, filePath: `/test/${file.name}` });
     }
     ftp.close();
   });
-
-  //   res.json({ fileName: file.name, filePath: `/uploads/${file.name}` });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || customConfig["serverPort"];
 app.listen(PORT, () => console.log(`server started on port ${PORT}`));
