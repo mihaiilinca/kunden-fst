@@ -1,15 +1,18 @@
 const express = require("express");
 const fileUpload = require("express-fileupload");
 const app = express();
-var EasyFtp = require("easy-ftp");
-var ftp = new EasyFtp();
+const EasyFtp = require("easy-ftp");
+const ftp = new EasyFtp();
+const fs = require("fs");
+const yaml = require("js-yaml");
+const customConfig = yaml.load(fs.readFileSync("./custom_config.yaml"));
 
-var config = {
-  host: "127.0.0.1",
-  type: "FTP",
-  port: "",
-  username: "Naj",
-  password: "",
+const config = {
+  host: customConfig["host"],
+  type: customConfig["type"],
+  port: customConfig["port"],
+  username: customConfig["username"],
+  password: customConfig["host"],
 };
 
 ftp.connect(config);
@@ -31,7 +34,7 @@ app.post("/upload", (req, res) => {
   const file = req.files.file;
   const tempFileName = file.tempFilePath.split("/").at(-1);
 
-  ftp.upload(file.tempFilePath, "/test", function (err) {
+  ftp.upload(file.tempFilePath, `/test/${file.name}`, function (err) {
     if (err) {
       console.log(err);
       return res.status(500).send(err);
@@ -39,12 +42,9 @@ app.post("/upload", (req, res) => {
       // console.log("finished:", res);
       res.json({ fileName: file.name, filePath: `/test/${file.name}` });
     }
-    // ftp.mv(`/test/${tempFileName}`, "/abc.pdf", function (error) {
-    // if (error) throw error;
-    // });
     ftp.close();
   });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || customConfig["serverPort"];
 app.listen(PORT, () => console.log(`server started on port ${PORT}`));

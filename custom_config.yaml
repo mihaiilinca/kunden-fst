@@ -1,0 +1,8 @@
+--- # FTP Login data
+host: "127.0.0.1"
+type: "FTP"
+port: ""
+username: "Naj"
+password: ""
+serverPort: 5000
+whiteListfilter: ".pdf"
