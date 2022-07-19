@@ -3,7 +3,7 @@ import axios from "axios";
 import Message from "./Message";
 import Progress from "./Progress";
 import { useNavigate, Redirect } from "react-router-dom";
-
+import logo from "./IMC_logo_standard_RGB.svg";
 const FileUpload = () => {
   //actual file and filename should go into state because the label "Choose File" needs to be replaced with the actual filename
 
@@ -67,7 +67,16 @@ const FileUpload = () => {
     <Fragment>
       <div className="container mt-4">
         <h4 className="display-4 text-center mb-4">
-          <i className="fa-solid fa-upload"></i>File Transfer Tool
+          <img
+            src={logo}
+            alt="imc_logo"
+            width="200"
+            height="300"
+            paddingright="12"
+          ></img>
+          <p>
+            <b>File Transfer Tool</b>{" "}
+          </p>
         </h4>
       </div>
       {message ? <Message msg={message} /> : null}

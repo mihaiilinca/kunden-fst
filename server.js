@@ -12,7 +12,7 @@ const config = {
   type: customConfig["type"],
   port: customConfig["port"],
   username: customConfig["username"],
-  password: customConfig["host"],
+  password: customConfig["password"],
 };
 
 ftp.connect(config);
